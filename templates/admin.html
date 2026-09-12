@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>
+        Admin Dashboard - Humanity Help Hub
+    </title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+    <style>
+
+        .dashboard-title {
+            text-align: center;
+            color: #1f4e79;
+            margin-bottom: 10px;
+        }
+
+        .dashboard-subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .stats {
+
+            display: grid;
+
+            grid-template-columns:
+            repeat(2, 1fr);
+
+            gap: 20px;
+
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+
+            background: white;
+
+            padding: 25px;
+
+            border-radius: 15px;
+
+            text-align: center;
+
+            box-shadow:
+            0 5px 18px
+            rgba(0,0,0,0.08);
+        }
+
+        .stat-card h2 {
+
+            font-size: 40px;
+
+            color: #1f6feb;
+
+            margin-bottom: 8px;
+        }
+
+        .stat-card p {
+
+            color: #666;
+
+            font-weight: bold;
+        }
+
+        .section {
+
+            background: white;
+
+            padding: 25px;
+
+            border-radius: 15px;
+
+            margin-bottom: 25px;
+
+            box-shadow:
+            0 5px 18px
+            rgba(0,0,0,0.08);
+        }
+
+        .section h2 {
+
+            color: #1f4e79;
+
+            margin-bottom: 20px;
+        }
+
+        .admin-item {
+
+            padding: 18px;
+
+            border-bottom:
+            1px solid #eeeeee;
+
+            position: relative;
+        }
+
+        .admin-item:last-child {
+
+            border-bottom: none;
+        }
+
+        .admin-item strong {
+
+            color: #198754;
+        }
+
+        .delete-btn {
+
+            background: #dc3545;
+
+            color: white;
+
+            border: none;
+
+            padding: 9px 14px;
+
+            border-radius: 8px;
+
+            cursor: pointer;
+
+            font-weight: bold;
+
+            margin-top: 12px;
+        }
+
+        .delete-btn:hover {
+
+            opacity: 0.85;
+        }
+
+        .empty {
+
+            color: #777;
+
+            text-align: center;
+
+            padding: 20px;
+        }
+
+        .message {
+
+            display: none;
+
+            padding: 12px;
+
+            border-radius: 8px;
+
+            margin-bottom: 20px;
+
+            text-align: center;
+
+            font-weight: bold;
+        }
+
+        .success-message {
+
+            background: #d1e7dd;
+
+            color: #0f5132;
+        }
+
+        .error-message {
+
+            background: #f8d7da;
+
+            color: #842029;
+        }
+
+        .home-button {
+
+            display: block;
+
+            text-align: center;
+
+            text-decoration: none;
+
+            margin-top: 25px;
+        }
+
+        @media (max-width: 600px) {
+
+            .stats {
+
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<div class="container">
+
+    <h1 class="dashboard-title">
+        📊 Admin Dashboard
+    </h1>
+
+    <p class="dashboard-subtitle">
+        Humanity Help Hub Management Panel
+    </p>
+
+
+    <!-- Messages -->
+
+    <div id="successMessage"
+         class="message success-message">
+    </div>
+
+    <div id="errorMessage"
+         class="message error-message">
+    </div>
+
+
+    <!-- Statistics -->
+
+    <div class="stats">
+
+        <div class="stat-card">
+
+            <h2 id="totalRequests">
+                0
+            </h2>
+
+            <p>
+                📋 Total Help Requests
+            </p>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <h2 id="totalOffers">
+                0
+            </h2>
+
+            <p>
+                ❤️ Total Help Offers
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- Requests -->
+
+    <div class="section">
+
+        <h2>
+            📋 Latest Help Requests
+        </h2>
+
+        <div id="latestRequests">
+
+            <div class="empty">
+                Loading...
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Offers -->
+
+    <div class="section">
+
+        <h2>
+            ❤️ Latest Help Offers
+        </h2>
+
+        <div id="latestOffers">
+
+            <div class="empty">
+                Loading...
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Back -->
+
+    <a href="/"
+       class="home-button back-btn">
+
+        ← Back to Home
+
+    </a>
+
+</div>
+
+
+<script>
+
+
+// ---------------- MESSAGE ----------------
+
+function showSuccess(message) {
+
+    const box =
+        document.getElementById(
+            "successMessage"
+        );
+
+    box.textContent =
+        "✅ " + message;
+
+    box.style.display =
+        "block";
+
+    setTimeout(function() {
+
+        box.style.display =
+            "none";
+
+    }, 3000);
+}
+
+
+function showError(message) {
+
+    const box =
+        document.getElementById(
+            "errorMessage"
+        );
+
+    box.textContent =
+        "❌ " + message;
+
+    box.style.display =
+        "block";
+
+    setTimeout(function() {
+
+        box.style.display =
+            "none";
+
+    }, 3000);
+}
+
+
+// ---------------- SECURITY ----------------
+
+function escapeHtml(text) {
+
+    const div =
+        document.createElement("div");
+
+    div.textContent =
+        text ?? "";
+
+    return div.innerHTML;
+}
+
+
+// ---------------- DELETE REQUEST ----------------
+
+async function deleteRequest(requestId) {
+
+    const confirmDelete =
+        confirm(
+            "Are you sure you want to delete this help request?"
+        );
+
+    if (!confirmDelete) {
+        return;
+    }
+
+
+    try {
+
+        const response =
+            await fetch(
+                "/api/delete-request/" +
+                requestId,
+                {
+                    method: "DELETE"
+                }
+            );
+
+
+        const result =
+            await response.json();
+
+
+        if (response.ok) {
+
+            showSuccess(
+                result.message
+            );
+
+            loadDashboard();
+
+        } else {
+
+            showError(
+                result.message ||
+                "Unable to delete request."
+            );
+        }
+
+
+    } catch (error) {
+
+        showError(
+            "Server connection error."
+        );
+
+    }
+
+}
+
+
+// ---------------- DELETE OFFER ----------------
+
+async function deleteOffer(offerId) {
+
+    const confirmDelete =
+        confirm(
+            "Are you sure you want to delete this help offer?"
+        );
+
+    if (!confirmDelete) {
+        return;
+    }
+
+
+    try {
+
+        const response =
+            await fetch(
+                "/api/delete-offer/" +
+                offerId,
+                {
+                    method: "DELETE"
+                }
+            );
+
+
+        const result =
+            await response.json();
+
+
+        if (response.ok) {
+
+            showSuccess(
+                result.message
+            );
+
+            loadDashboard();
+
+        } else {
+
+            showError(
+                result.message ||
+                "Unable to delete offer."
+            );
+        }
+
+
+    } catch (error) {
+
+        showError(
+            "Server connection error."
+        );
+
+    }
+
+}
+
+
+// ---------------- LOAD DASHBOARD ----------------
+
+async function loadDashboard() {
+
+    try {
+
+        // Requests
+
+        const requestsResponse =
+            await fetch(
+                "/api/requests"
+            );
+
+        const requests =
+            await requestsResponse.json();
+
+
+        // Offers
+
+        const offersResponse =
+            await fetch(
+                "/api/offers"
+            );
+
+        const offers =
+            await offersResponse.json();
+
+
+        // Count
+
+        document.getElementById(
+            "totalRequests"
+        ).textContent =
+            requests.length;
+
+
+        document.getElementById(
+            "totalOffers"
+        ).textContent =
+            offers.length;
+
+
+        // ---------------- REQUEST LIST ----------------
+
+        const latestRequests =
+            document.getElementById(
+                "latestRequests"
+            );
+
+        latestRequests.innerHTML = "";
+
+
+        if (requests.length === 0) {
+
+            latestRequests.innerHTML =
+                '<div class="empty">' +
+                'No help requests yet.' +
+                '</div>';
+
+        } else {
+
+            requests
+                .slice(0, 10)
+                .forEach(function(request) {
+
+                    const item =
+                        document.createElement(
+                            "div"
+                        );
+
+                    item.className =
+                        "admin-item";
+
+
+                    item.innerHTML = `
+
+                        <strong>
+                            🙏 ${escapeHtml(request.name)}
+                        </strong>
+
+                        <br><br>
+
+                        📞 ${escapeHtml(request.phone)}
+
+                        <br>
+
+                        📂 ${escapeHtml(request.category)}
+
+                        <br>
+
+                        📍 ${escapeHtml(request.location)}
+
+                        <br>
+
+                        📝 ${escapeHtml(request.problem)}
+
+                        <br>
+
+                        🕒 ${escapeHtml(request.created_at)}
+
+                        <br>
+
+                        <button
+                            class="delete-btn"
+                            onclick="deleteRequest(${request.id})">
+
+                            🗑️ Delete Request
+
+                        </button>
+
+                    `;
+
+
+                    latestRequests
+                        .appendChild(item);
+
+                });
+
+        }
+
+
+        // ---------------- OFFER LIST ----------------
+
+        const latestOffers =
+            document.getElementById(
+                "latestOffers"
+            );
+
+        latestOffers.innerHTML = "";
+
+
+        if (offers.length === 0) {
+
+            latestOffers.innerHTML =
+                '<div class="empty">' +
+                'No help offers yet.' +
+                '</div>';
+
+        } else {
+
+            offers
+                .slice(0, 10)
+                .forEach(function(offer) {
+
+                    const item =
+                        document.createElement(
+                            "div"
+                        );
+
+                    item.className =
+                        "admin-item";
+
+
+                    item.innerHTML = `
+
+                        <strong>
+                            ❤️ ${escapeHtml(offer.helper_name)}
+                        </strong>
+
+                        <br><br>
+
+                        📞 ${escapeHtml(offer.helper_phone)}
+
+                        <br>
+
+                        👤 For:
+                        ${escapeHtml(
+                            offer.requester_name ||
+                            "Request"
+                        )}
+
+                        <br>
+
+                        📂 ${escapeHtml(
+                            offer.category || ""
+                        )}
+
+                        <br>
+
+                        📍 ${escapeHtml(
+                            offer.location || ""
+                        )}
+
+                        <br>
+
+                        💬 ${escapeHtml(
+                            offer.message
+                        )}
+
+                        <br>
+
+                        🕒 ${escapeHtml(
+                            offer.created_at
+                        )}
+
+                        <br>
+
+                        <button
+                            class="delete-btn"
+                            onclick="deleteOffer(${offer.id})">
+
+                            🗑️ Delete Offer
+
+                        </button>
+
+                    `;
+
+
+                    latestOffers
+                        .appendChild(item);
+
+                });
+
+        }
+
+
+    } catch (error) {
+
+        console.error(error);
+
+
+        document.getElementById(
+            "latestRequests"
+        ).innerHTML =
+            '<div class="empty">' +
+            '❌ Unable to load dashboard data.' +
+            '</div>';
+
+
+        document.getElementById(
+            "latestOffers"
+        ).innerHTML =
+            '<div class="empty">' +
+            '❌ Unable to load dashboard data.' +
+            '</div>';
+
+    }
+
+}
+
+
+// Load dashboard
+
+loadDashboard();
+
+
+</script>
+
+</body>
+
+</html>

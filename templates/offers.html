@@ -1,0 +1,203 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Help Offers - Humanity Help Hub</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+    <style>
+        .offer-card {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 15px;
+            padding: 22px;
+            margin-top: 20px;
+            box-shadow: 0 5px 18px rgba(0,0,0,0.08);
+        }
+
+        .offer-card h3 {
+            color: #198754;
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+
+        .offer-card p {
+            text-align: left;
+            margin: 9px 0;
+            line-height: 1.5;
+        }
+
+        .empty-message {
+            text-align: center;
+            margin-top: 30px;
+            padding: 30px;
+            background: white;
+            border-radius: 15px;
+            color: #777;
+        }
+
+        .back-btn {
+            display: block;
+            text-align: center;
+            margin-top: 25px;
+            text-decoration: none;
+        }
+
+        .error-message {
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8d7da;
+            color: #842029;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="header">
+
+        <h1>❤️ Help Offers</h1>
+
+        <p>
+            People who offered to help are shown below.
+        </p>
+
+    </div>
+
+    <div id="offersList"></div>
+
+    <a href="/" class="back-btn">
+        ← Back to Home
+    </a>
+
+</div>
+
+<script>
+
+const offersList = document.getElementById("offersList");
+
+
+async function loadOffers() {
+
+    try {
+
+        const response = await fetch("/api/offers");
+
+        if (!response.ok) {
+            throw new Error("Unable to load offers");
+        }
+
+        const offers = await response.json();
+
+        offersList.innerHTML = "";
+
+        if (offers.length === 0) {
+
+            offersList.innerHTML = `
+                <div class="empty-message">
+                    <h2>❤️ No Help Offers Yet</h2>
+                    <p>
+                        No one has offered help yet.
+                    </p>
+                </div>
+            `;
+
+            return;
+        }
+
+
+        offers.forEach(function(offer) {
+
+            const card = document.createElement("div");
+
+            card.className = "offer-card";
+
+            card.innerHTML = `
+
+                <h3>
+                    ❤️ ${escapeHtml(offer.helper_name)}
+                </h3>
+
+                <p>
+                    📞 <strong>Helper Phone:</strong>
+                    ${escapeHtml(offer.helper_phone)}
+                </p>
+
+                <p>
+                    👤 <strong>Helping:</strong>
+                    ${escapeHtml(offer.requester_name || "Request")}
+                </p>
+
+                <p>
+                    📂 <strong>Category:</strong>
+                    ${escapeHtml(offer.category || "")}
+                </p>
+
+                <p>
+                    📍 <strong>Location:</strong>
+                    ${escapeHtml(offer.location || "")}
+                </p>
+
+                <p>
+                    💬 <strong>Message:</strong>
+                    ${escapeHtml(offer.message)}
+                </p>
+
+                <p>
+                    🕒 <strong>Date:</strong>
+                    ${escapeHtml(offer.created_at)}
+                </p>
+
+            `;
+
+            offersList.appendChild(card);
+
+        });
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+        offersList.innerHTML = `
+            <div class="error-message">
+                ❌ Unable to load help offers.
+                <br><br>
+                Please make sure Flask is running.
+            </div>
+        `;
+
+    }
+
+}
+
+
+function escapeHtml(text) {
+
+    const div = document.createElement("div");
+
+    div.textContent = text ?? "";
+
+    return div.innerHTML;
+
+}
+
+
+loadOffers();
+
+</script>
+
+</body>
+</html>
+```

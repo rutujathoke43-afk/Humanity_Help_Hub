@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Help Requests - Humanity Help Hub</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+    <style>
+        .request-card {
+            background: white;
+            padding: 25px;
+            margin-bottom: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 18px rgba(0,0,0,0.08);
+        }
+
+        .request-card h2 {
+            color: #1f4e79;
+            margin-bottom: 15px;
+        }
+
+        .request-card p {
+            margin: 8px 0;
+        }
+
+        .category {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            background: #e7f1ff;
+            color: #1f6feb;
+            font-weight: bold;
+        }
+
+        .help-form {
+            display: none;
+            margin-top: 20px;
+            padding: 20px;
+            background: #f4f7fb;
+            border-radius: 12px;
+        }
+
+        .no-requests {
+            background: white;
+            padding: 30px;
+            text-align: center;
+            border-radius: 15px;
+            color: #666;
+        }
+
+        .success {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="header">
+        <h1>📋 Help Requests</h1>
+        <p>People who need help from our community</p>
+    </div>
+
+
+    <!-- Search and Filter -->
+    <div class="search-box">
+
+        <input
+            type="text"
+            id="searchInput"
+            placeholder="🔎 Search by name, location or problem..."
+        >
+
+        <select id="categoryFilter">
+            <option value="">All Categories</option>
+            <option value="Food">Food</option>
+            <option value="Education">Education</option>
+            <option value="Medical">Medical</option>
+            <option value="Clothes">Clothes</option>
+            <option value="Emergency">Emergency</option>
+            <option value="Other">Other</option>
+        </select>
+
+    </div>
+
+
+    <!-- Requests Container -->
+    <div id="requestsContainer"></div>
+
+
+    <!-- Back Home -->
+    <a href="/" class="back-btn">
+        ← Back to Home
+    </a>
+
+</div>
+
+
+<script>
+
+let allRequests = [];
+
+
+const container =
+    document.getElementById("requestsContainer");
+
+const searchInput =
+    document.getElementById("searchInput");
+
+const categoryFilter =
+    document.getElementById("categoryFilter");
+
+
+// ---------------- LOAD REQUESTS ----------------
+
+async function loadRequests() {
+
+    try {
+
+        const response =
+            await fetch("/api/requests");
+
+        if (!response.ok) {
+            throw new Error("Failed to load requests");
+        }
+
+        allRequests =
+            await response.json();
+
+        displayRequests();
+
+    } catch (error) {
+
+        container.innerHTML = `
+            <div class="no-requests">
+                ❌ Unable to load requests.
+                <br><br>
+                Please make sure Flask is running.
+            </div>
+        `;
+
+    }
+}
+
+
+// ---------------- DISPLAY REQUESTS ----------------
+
+function displayRequests() {
+
+    const search =
+        searchInput.value.toLowerCase().trim();
+
+    const category =
+        categoryFilter.value;
+
+
+    const filteredRequests =
+        allRequests.filter(function(request) {
+
+            const matchesSearch =
+                request.name.toLowerCase().includes(search) ||
+                request.location.toLowerCase().includes(search) ||
+                request.problem.toLowerCase().includes(search);
+
+            const matchesCategory =
+                category === "" ||
+                request.category === category;
+
+            return matchesSearch && matchesCategory;
+
+        });
+
+
+    container.innerHTML = "";
+
+
+    if (filteredRequests.length === 0) {
+
+        container.innerHTML = `
+            <div class="no-requests">
+                <h2>🙁 No Help Requests Found</h2>
+                <p>There are no matching requests.</p>
+            </div>
+        `;
+
+        return;
+    }
+
+
+    filteredRequests.forEach(function(request) {
+
+        const card =
+            document.createElement("div");
+
+        card.className = "request-card";
+
+
+        const title =
+            document.createElement("h2");
+
+        title.textContent =
+            "🙏 " + request.name;
+
+
+        const category =
+            document.createElement("span");
+
+        category.className = "category";
+
+        category.textContent =
+            request.category;
+
+
+        const phone =
+            document.createElement("p");
+
+        phone.textContent =
+            "📞 Phone: " + request.phone;
+
+
+        const problem =
+            document.createElement("p");
+
+        problem.textContent =
+            "📝 Problem: " + request.problem;
+
+
+        const location =
+            document.createElement("p");
+
+        location.textContent =
+            "📍 Location: " + request.location;
+
+
+        const date =
+            document.createElement("p");
+
+        date.textContent =
+            "🕒 Date: " + request.created_at;
+
+
+        const helpButton =
+            document.createElement("button");
+
+        helpButton.className =
+            "help-btn";
+
+        helpButton.textContent =
+            "❤️ I Want to Help";
+
+
+        helpButton.onclick =
+            function() {
+
+                showHelpForm(
+                    request.id,
+                    request.name
+                );
+
+            };
+
+
+        card.appendChild(title);
+
+        card.appendChild(category);
+
+        card.appendChild(phone);
+
+        card.appendChild(problem);
+
+        card.appendChild(location);
+
+        card.appendChild(date);
+
+        card.appendChild(helpButton);
+
+
+        const form =
+            document.createElement("div");
+
+        form.className = "help-form";
+
+        form.id =
+            "help-form-" + request.id;
+
+
+        form.innerHTML = `
+
+            <h3>❤️ Offer Help to ${escapeHtml(request.name)}</h3>
+
+            <label>Your Name</label>
+
+            <input
+                type="text"
+                id="helper-name-${request.id}"
+                placeholder="Enter your name"
+                required
+            >
+
+            <label>Your Phone</label>
+
+            <input
+                type="tel"
+                id="helper-phone-${request.id}"
+                placeholder="Enter your phone number"
+                required
+            >
+
+            <label>Message</label>
+
+            <textarea
+                id="helper-message-${request.id}"
+                placeholder="Write your help message..."
+                required
+            ></textarea>
+
+            <button
+                class="help-btn"
+                onclick="submitHelp(${request.id})"
+            >
+                Send Help Offer
+            </button>
+
+            <div
+                id="success-${request.id}"
+                class="success"
+            >
+                ✅ Your help offer has been sent!
+            </div>
+
+        `;
+
+
+        card.appendChild(form);
+
+        container.appendChild(card);
+
+    });
+
+}
+
+
+// ---------------- SHOW HELP FORM ----------------
+
+function showHelpForm(id, name) {
+
+    const form =
+        document.getElementById(
+            "help-form-" + id
+        );
+
+    if (form.style.display === "block") {
+
+        form.style.display = "none";
+
+    } else {
+
+        form.style.display = "block";
+
+        form.scrollIntoView({
+            behavior: "smooth",
+            block: "center"
+        });
+
+    }
+
+}
+
+
+// ---------------- SUBMIT HELP OFFER ----------------
+
+async function submitHelp(requestId) {
+
+    const name =
+        document.getElementById(
+            "helper-name-" + requestId
+        ).value.trim();
+
+
+    const phone =
+        document.getElementById(
+            "helper-phone-" + requestId
+        ).value.trim();
+
+
+    const message =
+        document.getElementById(
+            "helper-message-" + requestId
+        ).value.trim();
+
+
+    if (!name || !phone || !message) {
+
+        alert("Please fill all fields.");
+
+        return;
+
+    }
+
+
+    try {
+
+        const response =
+            await fetch("/api/help-offer", {
+
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+
+                    request_id: requestId,
+
+                    helper_name: name,
+
+                    helper_phone: phone,
+
+                    message: message
+
+                })
+
+            });
+
+
+        const result =
+            await response.json();
+
+
+        if (response.ok) {
+
+            const success =
+                document.getElementById(
+                    "success-" + requestId
+                );
+
+            success.style.display =
+                "block";
+
+
+            document.getElementById(
+                "helper-name-" + requestId
+            ).value = "";
+
+
+            document.getElementById(
+                "helper-phone-" + requestId
+            ).value = "";
+
+
+            document.getElementById(
+                "helper-message-" + requestId
+            ).value = "";
+
+        } else {
+
+            alert(
+                result.message ||
+                "Unable to send help offer."
+            );
+
+        }
+
+    } catch (error) {
+
+        alert(
+            "Server connection error."
+        );
+
+    }
+
+}
+
+
+// ---------------- SAFE HTML ----------------
+
+function escapeHtml(text) {
+
+    const div =
+        document.createElement("div");
+
+    div.textContent =
+        text;
+
+    return div.innerHTML;
+
+}
+
+
+// ---------------- SEARCH ----------------
+
+searchInput.addEventListener(
+    "input",
+    displayRequests
+);
+
+
+categoryFilter.addEventListener(
+    "change",
+    displayRequests
+);
+
+
+// ---------------- START ----------------
+
+loadRequests();
+
+</script>
+
+</body>
+</html>

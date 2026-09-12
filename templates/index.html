@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Humanity Help Hub</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- Header -->
+    <div class="header">
+        <h1>🤝 Humanity Help Hub</h1>
+
+        <p>
+            Helping people. Spreading humanity. Making a difference.
+        </p>
+    </div>
+
+
+    <!-- Main Home Section -->
+    <div class="home">
+
+        <div class="card">
+
+            <h2>🌍 Welcome to Humanity Help Hub</h2>
+
+            <p>
+                A platform where people can request help
+                and kind-hearted people can offer help.
+            </p>
+
+
+            <!-- Request Help -->
+            <a href="{{ url_for('request_help') }}"
+               class="home-btn">
+                🙏 Request Help
+            </a>
+
+
+            <!-- View Requests -->
+            <a href="{{ url_for('requests') }}"
+               class="home-btn requests-btn">
+                📋 View Help Requests
+            </a>
+
+
+            <!-- View Offers -->
+            <a href="{{ url_for('offers') }}"
+               class="home-btn offers-btn">
+                ❤️ View Help Offers
+            </a>
+
+
+            <!-- Admin Dashboard -->
+            <a href="{{ url_for('admin') }}"
+               class="home-btn">
+                📊 Admin Dashboard
+            </a>
+
+        </div>
+
+
+        <!-- Information Box -->
+        <div class="info-box">
+
+            <h3>💡 Help Someone Today</h3>
+
+            <p>
+                Even a small act of kindness can make
+                a big difference in someone's life.
+            </p>
+
+            <p>
+                🙏 Request help if you need it.
+                <br>
+                ❤️ Offer help if you can.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- Footer -->
+    <div class="footer">
+
+        <p>
+            © 2026 Humanity Help Hub
+        </p>
+
+        <p>
+            Made with ❤️ for Humanity
+        </p>
+
+    </div>
+
+</div>
+
+</body>
+</html>

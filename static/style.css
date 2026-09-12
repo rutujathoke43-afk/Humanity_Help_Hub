@@ -1,0 +1,246 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f4f7fb;
+    color: #222;
+    min-height: 100vh;
+}
+
+/* Main Container */
+.container {
+    width: 90%;
+    max-width: 1100px;
+    margin: 40px auto;
+}
+
+/* Header */
+.header {
+    background: white;
+    padding: 25px;
+    border-radius: 18px;
+    text-align: center;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    margin-bottom: 25px;
+}
+
+.header h1 {
+    font-size: 34px;
+    color: #1f4e79;
+    margin-bottom: 8px;
+}
+
+.header p {
+    color: #666;
+    font-size: 16px;
+}
+
+/* Home */
+.home {
+    text-align: center;
+}
+
+.home h1 {
+    font-size: 42px;
+    color: #1f4e79;
+    margin-bottom: 12px;
+}
+
+.home p {
+    color: #666;
+    margin-bottom: 30px;
+}
+
+/* Buttons */
+.home-btn,
+button,
+.back-btn {
+    display: inline-block;
+    border: none;
+    text-decoration: none;
+    padding: 14px 25px;
+    border-radius: 10px;
+    margin: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    background: #1f6feb;
+    color: white;
+    transition: 0.3s;
+}
+
+.home-btn:hover,
+button:hover,
+.back-btn:hover {
+    transform: translateY(-2px);
+    opacity: 0.9;
+}
+
+.requests-btn {
+    background: #28a745;
+}
+
+.offers-btn {
+    background: #e83e8c;
+}
+
+/* Cards */
+.card {
+    background: white;
+    padding: 25px;
+    border-radius: 16px;
+    margin-bottom: 20px;
+    box-shadow: 0 5px 18px rgba(0, 0, 0, 0.08);
+}
+
+.card h2 {
+    color: #1f4e79;
+    margin-bottom: 12px;
+}
+
+.card p {
+    margin: 8px 0;
+    line-height: 1.5;
+}
+
+/* Form */
+form {
+    background: white;
+    padding: 25px;
+    border-radius: 16px;
+    box-shadow: 0 5px 18px rgba(0, 0, 0, 0.08);
+}
+
+label {
+    display: block;
+    font-weight: bold;
+    margin-top: 15px;
+    margin-bottom: 7px;
+}
+
+input,
+select,
+textarea {
+    width: 100%;
+    padding: 13px;
+    border: 1px solid #ccc;
+    border-radius: 9px;
+    font-size: 15px;
+    outline: none;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    border-color: #1f6feb;
+}
+
+textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+/* Search */
+.search-box {
+    background: white;
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 25px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.06);
+}
+
+.search-box input,
+.search-box select {
+    margin-bottom: 10px;
+}
+
+/* Info Box */
+.info-box {
+    background: white;
+    padding: 25px;
+    border-radius: 16px;
+    margin-top: 25px;
+    text-align: center;
+    box-shadow: 0 5px 18px rgba(0, 0, 0, 0.07);
+}
+
+.info-box h2 {
+    color: #28a745;
+    margin-bottom: 10px;
+}
+
+/* Success Message */
+.success {
+    background: #d4edda;
+    color: #155724;
+    padding: 15px;
+    border-radius: 10px;
+    margin: 15px 0;
+    font-weight: bold;
+}
+
+/* Error Message */
+.error {
+    background: #f8d7da;
+    color: #721c24;
+    padding: 15px;
+    border-radius: 10px;
+    margin: 15px 0;
+    font-weight: bold;
+}
+
+/* Delete Button */
+.delete-btn {
+    background: #dc3545;
+}
+
+.delete-btn:hover {
+    background: #b02a37;
+}
+
+/* Help Button */
+.help-btn {
+    background: #28a745;
+}
+
+/* Footer */
+.footer {
+    text-align: center;
+    padding: 25px;
+    margin-top: 40px;
+    color: #777;
+}
+
+/* Mobile Responsive */
+@media (max-width: 600px) {
+
+    .container {
+        width: 94%;
+        margin: 20px auto;
+    }
+
+    .home h1 {
+        font-size: 30px;
+    }
+
+    .header h1 {
+        font-size: 26px;
+    }
+
+    .home-btn,
+    button,
+    .back-btn {
+        display: block;
+        width: 100%;
+        margin: 10px 0;
+    }
+
+    .card,
+    form {
+        padding: 18px;
+    }
+}

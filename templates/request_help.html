@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Request Help - Humanity Help Hub</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+    <style>
+        #successMessage {
+            display: none;
+            margin-top: 20px;
+            padding: 15px;
+            background: #d1e7dd;
+            color: #0f5132;
+            border: 1px solid #badbcc;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        #errorMessage {
+            display: none;
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8d7da;
+            color: #842029;
+            border: 1px solid #f5c2c7;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h1>🤝 Request Help</h1>
+
+        <p>Please fill the form below to request help.</p>
+
+        <form id="helpForm">
+
+            <label for="name">Your Name</label>
+            <input
+                type="text"
+                id="name"
+                placeholder="Enter your name"
+                required
+            >
+
+            <label for="phone">Phone Number</label>
+            <input
+                type="tel"
+                id="phone"
+                placeholder="Enter phone number"
+                required
+            >
+
+            <label for="category">Help Category</label>
+            <select id="category" required>
+                <option value="">Select help category</option>
+                <option value="Food">Food</option>
+                <option value="Education">Education</option>
+                <option value="Medical">Medical</option>
+                <option value="Clothes">Clothes</option>
+                <option value="Emergency">Emergency</option>
+                <option value="Other">Other</option>
+            </select>
+
+            <label for="problem">Describe Your Problem</label>
+            <textarea
+                id="problem"
+                rows="5"
+                placeholder="Write your problem here..."
+                required
+            ></textarea>
+
+            <label for="location">Location</label>
+            <input
+                type="text"
+                id="location"
+                placeholder="Enter your location"
+                required
+            >
+
+            <button type="submit">
+                Submit Request
+            </button>
+
+        </form>
+
+        <div id="successMessage">
+            ✅ Your help request has been submitted successfully!
+        </div>
+
+        <div id="errorMessage">
+            ❌ Something went wrong. Please try again.
+        </div>
+
+        <a href="/" class="back-btn">
+            ← Back to Home
+        </a>
+
+    </div>
+
+
+    <script>
+
+        const form = document.getElementById("helpForm");
+        const successMessage = document.getElementById("successMessage");
+        const errorMessage = document.getElementById("errorMessage");
+
+
+        form.addEventListener("submit", async function(event) {
+
+            event.preventDefault();
+
+            successMessage.style.display = "none";
+            errorMessage.style.display = "none";
+
+
+            const requestData = {
+
+                name: document.getElementById("name").value.trim(),
+
+                phone: document.getElementById("phone").value.trim(),
+
+                category: document.getElementById("category").value,
+
+                problem: document.getElementById("problem").value.trim(),
+
+                location: document.getElementById("location").value.trim()
+
+            };
+
+
+            try {
+
+                const response = await fetch("/api/request-help", {
+
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+
+                    body: JSON.stringify(requestData)
+
+                });
+
+
+                const result = await response.json();
+
+
+                if (response.ok) {
+
+                    successMessage.textContent =
+                        "✅ Your help request has been submitted successfully!";
+
+                    successMessage.style.display = "block";
+
+                    form.reset();
+
+                    successMessage.scrollIntoView({
+                        behavior: "smooth",
+                        block: "center"
+                    });
+
+                } else {
+
+                    errorMessage.textContent =
+                        "❌ " + (result.message || "Something went wrong.");
+
+                    errorMessage.style.display = "block";
+
+                }
+
+            } catch (error) {
+
+                errorMessage.textContent =
+                    "❌ Server connection error. Please make sure Flask is running.";
+
+                errorMessage.style.display = "block";
+
+            }
+
+        });
+
+    </script>
+
+</body>
+</html>
